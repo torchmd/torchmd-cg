@@ -116,10 +116,8 @@ class LNNP(pl.LightningModule):
 
         if self.hparams.weights is not None:
             self.weights = torch.from_numpy(np.load(self.hparams.weights))
-            self.shuffle = False
         else:
             self.weights = torch.ones(len(self.dataset))
-            self.shuffle = True
 
     def forward(self, x):
         return self.model(x)
@@ -127,7 +125,7 @@ class LNNP(pl.LightningModule):
     def train_dataloader(self):
         train_loader = DataLoader(self.train_dataset, sampler= WeightedRandomSampler(self.weights[self.idx_train], len(self.train_dataset)),
                                   batch_size=set_batch_size(self.hparams.batch_size,len(self.train_dataset)),
-                                  shuffle= self.shuffle, collate_fn=_collate_aseatoms,num_workers=self.hparams.num_workers,pin_memory=True)
+                                  shuffle=False, collate_fn=_collate_aseatoms,num_workers=self.hparams.num_workers,pin_memory=True)
         return train_loader
      
     def training_step(self, batch, batch_idx):
@@ -153,7 +151,7 @@ class LNNP(pl.LightningModule):
         return {'val_loss': loss}
 
     def validation_epoch_end(self, outputs):
-        avg_loss = torch.cat([x['val_loss'] for x in outputs]).mean()
+        avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
         logs = {'val_loss': avg_loss}
         return {'val_loss': avg_loss, 'log': logs}
   
