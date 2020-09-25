@@ -5,13 +5,13 @@ from nnp.schnet_dataset import SchNetDataset
 from schnetpack.environment import SimpleEnvironmentProvider
 from schnetpack.data.loader import _collate_aseatoms
 from torch.utils.data import DataLoader
-from nnp.models import ACEMD_Q
+from nnp.model import make_schnet_model, load_schnet_model
 from schnetpack import Properties
 
 
 class External:
     def __init__(self, netfile, embeddings, device="cpu"):
-        self.acemdq = ACEMD_Q.load(
+        self.model = load_schnet_model(
             netfile, device=device, derivative="forces", label="energy"
         )
         self.device = device
@@ -37,7 +37,7 @@ class External:
         ).to(device)
         self.atom_mask = torch.ones((nreplicas, natoms), dtype=torch.float32).to(device)
 
-        self.acemdq.model.eval()
+        self.model.eval()
 
     def calculate(self, pos, box):
         assert pos.ndim == 3
@@ -54,7 +54,7 @@ class External:
             Properties.neighbor_mask: self.neighbor_mask,
             Properties.atom_mask: self.atom_mask,
         }
-        pred = self.acemdq.model(batch)
+        pred = self.model(batch)
         return pred["energy"].detach(), pred["forces"].detach()
 
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # box_t = torch.Tensor(box).unsqueeze(0).to(mydevice)
     z = np.load("../../tests/data/chignolin_aa.npy")
     z = z[:, 1].astype(np.int)
-    ext = External("../../tests/data/acemdq.ckp.30", z, mydevice)
+    ext = External("../../tests/data/model.ckp.30", z, mydevice)
     Epot, f = ext.calculate(coords, box)
     print(Epot)
     print(f)
