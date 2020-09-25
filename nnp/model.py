@@ -24,25 +24,25 @@ def make_schnet_model(args):
 
 
 def load_schnet_model(model_file, **kargs):
-        ckp = torch.load(model_file, map_location=kargs['device'])
-        if 'info' in ckp.keys():
-            args = ckp['info']
-        else:
-            if 'hparams' in ckp.keys():
-                args = Namespace(**ckp['hparams'])
-            elif 'hyper_parameters' in ckp.keys():
-                args = Namespace(**ckp['hyper_parameters'])
+    ckp = torch.load(model_file, map_location=kargs['device'])
+    if 'info' in ckp.keys():
+        args = ckp['info']
+    else:
+        if 'hparams' in ckp.keys():
+            args = Namespace(**ckp['hparams'])
+        elif 'hyper_parameters' in ckp.keys():
+            args = Namespace(**ckp['hyper_parameters'])
 
-            new_state_dict = {k.replace('model.',''):ckp['state_dict'][k] for k in ckp['state_dict'].keys()}
-            ckp['state_dict'] = new_state_dict
+        new_state_dict = {k.replace('model.',''):ckp['state_dict'][k] for k in ckp['state_dict'].keys()}
+        ckp['state_dict'] = new_state_dict
 
-        if not hasattr(args, 'trainable_gaussians'):
-            args.trainable_gaussians = False
+    if not hasattr(args, 'trainable_gaussians'):
+        args.trainable_gaussians = False
 
-        #override 
-        for k in kargs.keys():
-            setattr(args,k,kargs[k])
+    #override 
+    for k in kargs.keys():
+        setattr(args,k,kargs[k])
 
-        model = make_schnet_model(args)
-        model.load_state_dict(ckp['state_dict'])
-        return model
+    model = make_schnet_model(args)
+    model.load_state_dict(ckp['state_dict'])
+    return model
