@@ -20,6 +20,7 @@ def make_schnet_model(args):
                     property=label, derivative=args.derivative, negative_dr=negative_dr, 
                     mean=None, stddev=None, atomref=atomrefs)
     model = atm.AtomisticModel(reps, output)
+    model.to(args.device)
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print('Number of trainable parameters {}'.format(total_params))
     return model
