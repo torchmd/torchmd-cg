@@ -14,6 +14,7 @@ class External:
         self.model = load_schnet_model(
             netfile, device=device, derivative="forces", label="energy"
         )
+        self.model.to(device)
         self.device = device
         self.embeddings = embeddings.to(device)
 

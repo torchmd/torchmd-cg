@@ -1,9 +1,11 @@
+import torch
 import schnetpack as spk
 import schnetpack.atomistic as atm
 import schnetpack.representation as rep
 from schnetpack.nn.cutoff import CosineCutoff
 from schnetpack.data.loader import _collate_aseatoms
 from schnetpack.environment import SimpleEnvironmentProvider
+from argparse import Namespace 
 
 def make_schnet_model(args):
     label = args.label
