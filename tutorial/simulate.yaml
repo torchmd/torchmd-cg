@@ -1,0 +1,24 @@
+device: cuda:0
+forcefield: data/chignolin_priors_fulldata.yaml
+forceterms:
+- Bonds
+- RepulsionCG
+langevin_gamma: 1
+langevin_temperature: 350
+log_dir: sim_100ep_350K
+output: output
+output_period: 1000
+precision: double
+replicas: 10
+rfa: false
+save_period: 1000
+seed: 1
+steps: 10000000
+topology: data/chignolin_ca_top.psf
+coordinates: data/chignolin_ca_initial_coords.xtc
+temperature: 350
+timestep: 1
+external:
+  module: nnp.calculators.torchmdcalc
+  embeddings: [ 4,  4,  5,  8,  6, 13,  2, 13,  7,  4]
+  file: data/train_fulldata/epoch=100.ckpt
