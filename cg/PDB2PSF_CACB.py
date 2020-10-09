@@ -1,6 +1,6 @@
 import torch
 from moleculekit.molecule import Molecule
-from mappings import CACB_MAP
+from cg.mappings import CACB_MAP
 
 def PDB2PSF_CACB(pdb_name_in, psf_name_out, bonds=True, angles = True):
     mol = Molecule(pdb_name_in)
