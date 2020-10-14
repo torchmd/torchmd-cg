@@ -13,4 +13,7 @@ pip install torchmd_cg
 
 ## Usage
 
+```
+conda install seaborn pandas
+```
 Check the jupyter notebook in the `tutorial` folder
