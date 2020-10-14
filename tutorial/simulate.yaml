@@ -19,6 +19,6 @@ coordinates: data/chignolin_ca_initial_coords.xtc
 temperature: 350
 timestep: 1
 external:
-  module: nnp.calculators.torchmdcalc
+  module: torchmd_cg.nnp.calculators.torchmdcalc
   embeddings: [ 4,  4,  5,  8,  6, 13,  2, 13,  7,  4]
   file: data/train_fulldata/epoch=100.ckpt
