@@ -1,11 +1,11 @@
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from nnp.schnet_dataset import SchNetDataset
+from torchmd_cg.nnp.schnet_dataset import SchNetDataset
 from schnetpack.environment import SimpleEnvironmentProvider
 from schnetpack.data.loader import _collate_aseatoms
 from torch.utils.data import DataLoader
-from nnp.model import make_schnet_model, load_schnet_model
+from torchmd_cg.nnp.model import make_schnet_model, load_schnet_model
 from schnetpack import Properties
 
 
