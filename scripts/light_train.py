@@ -235,7 +235,7 @@ def main():
     args = get_args()
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
-    percent = 1.0
+
     model = LNNP(args)
     checkpoint_callback = ModelCheckpoint(
         filepath=args.log_dir,
@@ -256,10 +256,7 @@ def main():
         checkpoint_callback=checkpoint_callback,
         callbacks=[lr_logger],
         logger=tb_logger,
-        reload_dataloaders_every_epoch=False,
-        train_percent_check=percent,
-        val_percent_check=percent,
-        test_percent_check=percent,
+        reload_dataloaders_every_epoch=False
     )
 
     trainer.fit(model)
