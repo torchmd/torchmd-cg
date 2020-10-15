@@ -24,7 +24,7 @@ from torchmd_cg.nnp.model import make_schnet_model
 import argparse
 
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import LearningRateLogger
+from pytorch_lightning.callbacks import LearningRateMonitor
 
 
 def get_args():
@@ -160,8 +160,8 @@ class LNNP(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         prediction = self(batch)
         loss = self.loss_fn(prediction[self.hparams.label], batch[self.hparams.label])
-        logs = {"train_loss": loss}
-        return {"loss": loss, "log": logs}
+        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        return loss
 
     def val_dataloader(self):
         val_loader = None
@@ -183,12 +183,7 @@ class LNNP(pl.LightningModule):
         prediction = self(batch)
         torch.set_grad_enabled(False)
         loss = self.loss_fn(prediction[self.hparams.label], batch[self.hparams.label])
-        return {"val_loss": loss}
-
-    def validation_epoch_end(self, outputs):
-        avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
-        logs = {"val_loss": avg_loss}
-        return {"val_loss": avg_loss, "log": logs}
+        self.log('val_loss', loss)
 
     def test_dataloader(self):
         test_loader = None
@@ -210,12 +205,7 @@ class LNNP(pl.LightningModule):
         prediction = self(batch)
         torch.set_grad_enabled(False)
         loss = self.test_fn(prediction[self.hparams.label], batch[self.hparams.label])
-        return {"test_loss": loss}
-
-    def test_epoch_end(self, outputs):
-        avg_loss = torch.stack([x["test_loss"] for x in outputs]).mean()
-        logs = {"test_loss": avg_loss}
-        return {"test_loss": avg_loss, "log": logs}
+        self.log('test_loss', loss)
 
     def configure_optimizers(self):
         # optimizer = torch.optim.SGD(self.model.parameters(), lr=self.hparams.lr, momentum=0.9)
@@ -226,7 +216,7 @@ class LNNP(pl.LightningModule):
             factor=self.hparams.lr_factor,
             patience=self.hparams.lr_patience,
         )
-        return [optimizer], [scheduler]
+        return {'optimizer': optimizer, 'lr_scheduler': scheduler, 'monitor': 'val_loss'}
 
 
 def main():
@@ -243,7 +233,7 @@ def main():
         save_top_k=8,
         period=args.eval_interval,
     )
-    lr_logger = LearningRateLogger()
+    lr_monitor = LearningRateMonitor(logging_interval='epoch')
     tb_logger = pl.loggers.TensorBoardLogger(args.log_dir)
     trainer = pl.Trainer(
         gpus=args.gpus,
@@ -251,10 +241,10 @@ def main():
         distributed_backend=args.distributed_backend,
         num_nodes=args.num_nodes,
         default_root_dir=args.log_dir,
-        auto_lr_find=False,
+        auto_lr_find=True,
         resume_from_checkpoint=args.load_model,
         checkpoint_callback=checkpoint_callback,
-        callbacks=[lr_logger],
+        callbacks=[lr_monitor],
         logger=tb_logger,
         reload_dataloaders_every_epoch=False
     )
