@@ -44,6 +44,7 @@ def pdb2psf_CA(pdb_name_in, psf_name_out, bonds=True, angles=True):
 
 def pdb2psf_CACB(pdb_name_in, psf_name_out, bonds=True, angles=True):
     mol = Molecule(pdb_name_in)
+    mol.filter("name CA CB")
 
     n = mol.numAtoms
 
