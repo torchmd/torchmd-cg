@@ -216,7 +216,11 @@ class LNNP(pl.LightningModule):
             factor=self.hparams.lr_factor,
             patience=self.hparams.lr_patience,
         )
-        return {'optimizer': optimizer, 'lr_scheduler': scheduler, 'monitor': 'val_loss'}
+        lr_scheduler = {'scheduler':scheduler,
+                        'monitor':'val_loss',
+                        'interval': 'epoch',
+                        'frequency': 1} 
+        return [optimizer], [lr_scheduler]
 
 
 def main():
