@@ -216,7 +216,11 @@ class LNNP(pl.LightningModule):
             factor=self.hparams.lr_factor,
             patience=self.hparams.lr_patience,
         )
-        return {'optimizer': optimizer, 'lr_scheduler': scheduler, 'monitor': 'val_loss'}
+        lr_scheduler = {'scheduler':scheduler,
+                        'monitor':'val_loss',
+                        'interval': 'epoch',
+                        'frequency': 1} 
+        return [optimizer], [lr_scheduler]
 
 
 def main():
@@ -241,7 +245,7 @@ def main():
         distributed_backend=args.distributed_backend,
         num_nodes=args.num_nodes,
         default_root_dir=args.log_dir,
-        auto_lr_find=True,
+        auto_lr_find=False,
         resume_from_checkpoint=args.load_model,
         checkpoint_callback=checkpoint_callback,
         callbacks=[lr_monitor],
