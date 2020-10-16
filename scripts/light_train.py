@@ -183,7 +183,7 @@ class LNNP(pl.LightningModule):
         prediction = self(batch)
         torch.set_grad_enabled(False)
         loss = self.loss_fn(prediction[self.hparams.label], batch[self.hparams.label])
-        self.log('val_loss', loss)
+        self.log('val_loss', loss, on_epoch=True)
 
     def test_dataloader(self):
         test_loader = None
