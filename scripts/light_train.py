@@ -215,11 +215,13 @@ class LNNP(pl.LightningModule):
             "min",
             factor=self.hparams.lr_factor,
             patience=self.hparams.lr_patience,
+            min_lr=self.hparams.lr_min
         )
         lr_scheduler = {'scheduler':scheduler,
                         'monitor':'val_loss',
                         'interval': 'epoch',
-                        'frequency': 1} 
+                        'frequency': 1,
+                        } 
         return [optimizer], [lr_scheduler]
 
 
@@ -234,7 +236,7 @@ def main():
     checkpoint_callback = ModelCheckpoint(
         filepath=args.log_dir,
         monitor="val_loss",
-        save_top_k=8,
+        save_top_k=-1,
         period=args.eval_interval,
     )
     lr_monitor = LearningRateMonitor(logging_interval='epoch')
