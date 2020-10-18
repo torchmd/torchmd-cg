@@ -236,7 +236,7 @@ def main():
     checkpoint_callback = ModelCheckpoint(
         filepath=args.log_dir,
         monitor="val_loss",
-        save_top_k=-1,
+        save_top_k=8,
         period=args.eval_interval,
     )
     lr_monitor = LearningRateMonitor(logging_interval='epoch')
