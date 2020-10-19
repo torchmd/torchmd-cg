@@ -183,7 +183,11 @@ class LNNP(pl.LightningModule):
         prediction = self(batch)
         torch.set_grad_enabled(False)
         loss = self.loss_fn(prediction[self.hparams.label], batch[self.hparams.label])
-        self.log('val_loss', loss)
+        return loss
+
+    def validation_epoch_end(self, validation_step_outputs):
+        avg_loss = torch.stack(validation_step_outputs).mean()
+        self.log("val_loss", avg_loss)
 
     def test_dataloader(self):
         test_loader = None
@@ -205,7 +209,11 @@ class LNNP(pl.LightningModule):
         prediction = self(batch)
         torch.set_grad_enabled(False)
         loss = self.test_fn(prediction[self.hparams.label], batch[self.hparams.label])
-        self.log('test_loss', loss)
+        return loss
+
+    def test_epoch_end(self, test_step_outputs):
+        avg_loss = torch.stack(test_step_outputs).mean()
+        self.log("test_loss", avg_loss)
 
     def configure_optimizers(self):
         # optimizer = torch.optim.SGD(self.model.parameters(), lr=self.hparams.lr, momentum=0.9)
