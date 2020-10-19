@@ -160,7 +160,7 @@ class LNNP(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         prediction = self(batch)
         loss = self.loss_fn(prediction[self.hparams.label], batch[self.hparams.label])
-        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('train_loss', loss, on_step=True, on_epoch=False, prog_bar=True, logger=True)
         return loss
 
     def val_dataloader(self):
@@ -231,7 +231,6 @@ class LNNP(pl.LightningModule):
                         'frequency': 1,
                         } 
         return [optimizer], [lr_scheduler]
-
 
 def main():
     from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
