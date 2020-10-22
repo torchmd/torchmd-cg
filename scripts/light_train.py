@@ -46,13 +46,12 @@ def get_args():
     parser.add_argument('--label', default='forces', help='Label')
     parser.add_argument('--derivative', default='forces', help='Label')
     parser.add_argument('--eval-interval',type=int,default=2,help='eval interval, one eval per n updates (default: 2)')
-    parser.add_argument('--test-interval',type=int,default=10,help='eval interval, one eval per n updates (default: 10)')
     parser.add_argument('--save-interval',type=int,default=10,help='save interval, one save per n updates (default: 10)')
     parser.add_argument('--seed',type=int,default=1,help='random seed (default: 1)')
     parser.add_argument('--load-model',default=None,help='Restart training using a model checkpoint')  
     parser.add_argument('--progress',action='store_true', default=False,help='Progress bar during batching')  
     parser.add_argument('--val-ratio',type=float, default=0.05,help='Percentual of validation set')  
-    parser.add_argument('--test-ratio',type=float, default=0.1,help='Percentual of test set')  
+    parser.add_argument('--test-ratio',type=float, default=0,help='Percentual of test set')  
     parser.add_argument('--num-workers',type=int, default=0,help='Number of workers for data prefetch') 
     parser.add_argument('--num-filters',type=int, default=128,help='Number of filter in model') 
     parser.add_argument('--num-gaussians',type=int, default=50,help='Number of Gaussians in model') 
@@ -65,9 +64,6 @@ def get_args():
     parser.add_argument('--distributed-backend', default='ddp', help='Distributed backend: dp, ddp, ddp2')
     # fmt: on
     args = parser.parse_args()
-
-    if args.test_ratio == 0:
-        args.test_interval = 0
 
     if args.val_ratio == 0:
         args.eval_interval = 0
