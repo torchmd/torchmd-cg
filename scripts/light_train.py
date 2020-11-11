@@ -61,6 +61,7 @@ def get_args():
     parser.add_argument('--lr-patience',type=int,default=10,help='Patience for lr-schedule. Patience per eval-interval of validation')
     parser.add_argument('--lr-min',type=float, default=1e-6,help='Minimum learning rate before early stop') 
     parser.add_argument('--lr-factor',type=float, default=0.8,help='Minimum learning rate before early stop') 
+    parser.add_argument('--weight-decay',type=float, default=0,help='Weight decay for atomwise output network') 
     parser.add_argument('--distributed-backend', default='ddp', help='Distributed backend: dp, ddp, ddp2')
     # fmt: on
     args = parser.parse_args()
@@ -90,6 +91,33 @@ def make_splits(
         np.savez(filename, idx_train=idx_train, idx_val=idx_val, idx_test=idx_test)
 
     return idx_train, idx_val, idx_test
+
+
+def group_weight(module, weight_decay, decay_modules):
+    if not hasattr(decay_modules, '__iter__'):
+        decay_modules = [decay_modules]
+    group_decay = []
+    group_no_decay = []
+    for m in module.modules():
+        if m.__class__ in decay_modules:
+            try:
+                group_decay.append(m.weight)
+            except:
+                pass
+        else:
+            try:
+                group_no_decay.append(m.weight)
+            except:
+                pass
+        try:
+            if m.bias is not None:
+                group_no_decay.append(m.bias)
+        except:
+            pass
+
+    assert len(list(module.parameters())) == len(group_decay) + len(group_no_decay)
+    groups = [dict(params=group_decay), dict(params=group_no_decay, weight_decay=weight_decay)]
+    return groups
 
 
 class LNNP(pl.LightningModule):
@@ -213,7 +241,8 @@ class LNNP(pl.LightningModule):
 
     def configure_optimizers(self):
         # optimizer = torch.optim.SGD(self.model.parameters(), lr=self.hparams.lr, momentum=0.9)
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.lr)
+        params = group_weight(self.model, self.hparams.weight_decay, spk.atomistic.Atomwise)
+        optimizer = torch.optim.AdamW(params, lr=self.hparams.lr)
         scheduler = ReduceLROnPlateau(
             optimizer,
             "min",
