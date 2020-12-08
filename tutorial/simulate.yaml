@@ -9,7 +9,7 @@ forceterms:
 - Bonds
 - RepulsionCG
 external:
-  module: torchmd_cg.nnp.calculators.torchmdcalc
+  module: torchmdnet.nnp.calculators.torchmdcalc
   embeddings: [ 4,  4,  5,  8,  6, 13,  2, 13,  7,  4]
   file: data/train_fulldata/epoch=80.ckpt
 langevin_gamma: 1
